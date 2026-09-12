@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAWU × 泰国内容电商增长提案 | MCN 合作方案</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0A1A; --bg2:#131029; --panel:#171331;
+    --pink:#FF2E63; --cyan:#08D9D6; --gold:#F9C80E; --violet:#8B5CF6;
+    --ink:#EDEBF6; --dim:#9C96B8;
+  }
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Space Grotesk','Noto Sans SC',sans-serif;
+    overflow-x:hidden;
+  }
+  .font-display{font-family:'Unbounded','Noto Sans SC',sans-serif;}
+  .font-mono2{font-family:'JetBrains Mono',monospace;}
+  .zh{font-family:'Noto Sans SC',sans-serif;}
+
+  /* ---- atmospheric background ---- */
+  .bg-noise{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none;}
+  .orb-a{width:520px;height:520px;background:rgba(255,46,99,.14);top:-140px;right:-120px;animation:drift 16s ease-in-out infinite alternate;}
+  .orb-b{width:420px;height:420px;background:rgba(8,217,214,.10);bottom:-100px;left:-140px;animation:drift 20s ease-in-out infinite alternate-reverse;}
+  @keyframes drift{from{transform:translate(0,0)}to{transform:translate(40px,50px)}}
+
+  .grid-lines{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
+    background-image:linear-gradient(rgba(139,92,246,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.05) 1px,transparent 1px);
+    background-size:64px 64px;
+  }
+
+  /* ---- progress ---- */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0%;z-index:60;
+    background:linear-gradient(90deg,var(--cyan),var(--pink),var(--gold));
+    box-shadow:0 0 12px rgba(255,46,99,.7);}
+
+  /* ---- glass panels ---- */
+  .glass{
+    background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+    border:1px solid rgba(255,255,255,.09);
+    backdrop-filter:blur(14px);border-radius:20px;
+  }
+  .glass-hover{transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,box-shadow .35s;}
+  .glass-hover:hover{transform:translateY(-6px);border-color:rgba(255,46,99,.45);box-shadow:0 18px 50px -18px rgba(255,46,99,.35);}
+
+  .neon-text{text-shadow:0 0 22px rgba(255,46,99,.55);}
+  .cyan-text{text-shadow:0 0 22px rgba(8,217,214,.5);}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;
+    padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);
+    color:var(--dim);text-transform:uppercase;
+  }
+  .num-hero{font-family:'Unbounded','JetBrains Mono',sans-serif;font-weight:800;}
+
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.35em;color:var(--cyan);text-transform:uppercase;}
+  .sec-title{font-family:'Unbounded','Noto Sans SC',sans-serif;font-weight:800;line-height:1.15;}
+
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.4),transparent);}
+
+  .reveal{opacity:0;transform:translateY(36px);}
+  .chart-box{width:100%;height:420px;}
+  @media(max-width:768px){.chart-box{height:340px;}}
+
+  .status-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .on{background:var(--cyan);box-shadow:0 0 10px rgba(8,217,214,.8);}
+  .off{background:#4b4560;}
+
+  .roadmap-line{position:absolute;left:26px;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,var(--cyan),var(--pink),var(--gold));}
+
+  ::selection{background:rgba(255,46,99,.5);color:#fff;}
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:#2b2547;border-radius:5px;}
+</style>
+</head>
+<body class="antialiased">
+
+<div class="bg-noise"></div>
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<div class="grid-lines"></div>
+<div id="progress"></div>
+
+<!-- ================= NAV ================= -->
+<nav class="fixed top-0 inset-x-0 z-50 px-5 md:px-10 py-4 flex items-center justify-between"
+     style="background:rgba(11,10,26,.72);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07)">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-display font-extrabold text-sm"
+         style="background:linear-gradient(135deg,var(--pink),var(--violet));box-shadow:0 0 18px rgba(255,46,99,.5)">K</div>
+    <div class="leading-tight">
+      <div class="font-display text-sm font-semibold tracking-wide">KAWU <span class="text-[10px]" style="color:var(--dim)">× THAILAND</span></div>
+      <div class="text-[10px] font-mono2" style="color:var(--dim)">MCN GROWTH PROPOSAL · 2026</div>
+    </div>
+  </div>
+  <div class="hidden md:flex items-center gap-7 text-xs font-mono2" style="color:var(--dim)">
+    <a href="#client" class="hover:text-white transition">01 客户画像</a>
+    <a href="#market" class="hover:text-white transition">02 市场大盘</a>
+    <a href="#creator" class="hover:text-white transition">03 达人生态</a>
+    <a href="#rival" class="hover:text-white transition">04 竞品拆解</a>
+    <a href="#plan" class="hover:text-white transition">05 合作方案</a>
+  </div>
+  <div class="tag" style="border-color:rgba(255,46,99,.5);color:var(--pink)">CONFIDENTIAL</div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="relative z-10 min-h-screen flex flex-col justify-center px-6 md:px-16 pt-28 pb-16">
+  <div class="max-w-6xl mx-auto w-full">
+    <div class="tag mb-8 reveal" data-reveal>跨境内容电商 · 专项提案 · 2026.09</div>
+    <h1 class="font-display text-4xl md:text-7xl font-extrabold leading-[1.08] reveal" data-reveal>
+      KAWU 在泰国<br>
+      <span class="neon-text" style="color:var(--pink)">货架已经摆好</span>，<br>
+      <span class="cyan-text" style="color:var(--cyan)">舞台还没点亮</span>
+    </h1>
+    <p class="zh mt-8 text-base md:text-xl max-w-2xl leading-relaxed reveal" data-reveal style="color:var(--dim)">
+      Shopee / Lazada 官方店已在营，曼谷分公司已设立——但 TikTok 内容阵地、达人分销与品牌自播仍是空白。
+      在泰国 TikTok Shop 年 GMV 近 <span style="color:var(--gold)" class="font-mono2">70 亿美金</span> 的内容电商红利期，
+      这是 KAWU 下一个增长曲线的入口。
+    </p>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14">
+      <div class="glass glass-hover p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--pink)">$70亿</div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">2025 前三季度泰国 TikTok Shop GMV</div>
+      </div>
+      <div class="glass glass-hover p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--cyan)">92%</div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">泰国消费者依赖达人推荐（东南亚第一）</div>
+      </div>
+      <div class="glass glass-hover p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--gold)">20万+</div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">泰国 TikTok 带货达人规模</div>
+      </div>
+      <div class="glass glass-hover p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--violet)">2/7</div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">KAWU 泰国渠道布局：7 条主干道仅开通 2 条</div>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-4 reveal" data-reveal>
+      <a href="#client" class="zh px-7 py-3.5 rounded-full text-sm font-medium transition"
+         style="background:linear-gradient(90deg,var(--pink),#ff5c86);box-shadow:0 10px 30px -8px rgba(255,46,99,.6)">开始阅读 ↓</a>
+      <a href="#plan" class="zh px-7 py-3.5 rounded-full text-sm border transition hover:bg-white/5"
+         style="border-color:rgba(255,255,255,.18);color:var(--ink)">直接看合作方案</a>
+    </div>
+  </div>
+</header>
+
+<!-- SECTION 01 CLIENT -->
+<section id="client" class="relative z-10 px-6 md:px-16 py-24 md:py-32">
+  <div class="max-w-6xl mx-auto">
+    <div class="kicker reveal" data-reveal>01 / CLIENT INTELLIGENCE</div>
+    <h2 class="sec-title text-3xl md:text-5xl mt-4 reveal" data-reveal>客户画像：<span style="color:var(--cyan)">供应链很强</span>，<br>内容阵地<span style="color:var(--pink)">几乎空白</span></h2>
+    <p class="zh mt-6 max-w-3xl leading-relaxed reveal" data-reveal style="color:var(--dim)">
+      KAWU（卡屋）为佛山蒙得电器旗下品牌，日系风厨房小家电定位，与 BRUNO、虎牌同列"潮流小家电三大代表"（品牌宣传口径）。
+      工厂直供 + 全网电商基因 + 海外实体布局，构成了进入泰国内容电商的"弹药库"。
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-12">
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-3" style="color:var(--cyan)">FACTORY & SKUs</div>
+        <div class="num-hero text-3xl" style="color:var(--ink)">500<span class="text-base">+</span></div>
+        <div class="zh text-sm mt-1" style="color:var(--dim)">员工（含工厂），11,000㎡ 自有工厂</div>
+        <div class="divider my-4"></div>
+        <div class="num-hero text-3xl" style="color:var(--ink)">400<span class="text-base">+</span></div>
+        <div class="zh text-sm mt-1" style="color:var(--dim)">SKU · 50+ 专利 · 40+ 自研产品</div>
+      </div>
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-3" style="color:var(--pink)">BRAND MATRIX</div>
+        <div class="flex flex-wrap gap-2 mt-1">
+          <span class="zh text-xs px-3 py-1.5 rounded-full" style="background:rgba(255,46,99,.15);color:var(--pink);border:1px solid rgba(255,46,99,.35)">KAWU 卡屋</span>
+          <span class="zh text-xs px-3 py-1.5 rounded-full border" style="border-color:rgba(255,255,255,.14);color:var(--dim)">蒙得</span>
+          <span class="zh text-xs px-3 py-1.5 rounded-full border" style="border-color:rgba(255,255,255,.14);color:var(--dim)">NERF</span>
+          <span class="zh text-xs px-3 py-1.5 rounded-full border" style="border-color:rgba(255,255,255,.14);color:var(--dim)">狐狸多啦</span>
+          <span class="zh text-xs px-3 py-1.5 rounded-full border" style="border-color:rgba(255,255,255,.14);color:var(--dim)">BLACKBABY</span>
+        </div>
+        <p class="zh text-xs mt-4 leading-relaxed" style="color:var(--dim)">同时为康佳、长虹、创维、海尔、志高、帅康等贴牌代工——供应链成熟度与成本控制是底层优势。</p>
+      </div>
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-3" style="color:var(--gold)">GLOBAL FOOTPRINT</div>
+        <p class="zh text-sm leading-relaxed" style="color:var(--dim)">
+          总部佛山顺德 · 关联公司辽宁猫眼科技（沈阳）<br>
+          海外分支：<span style="color:var(--ink)">曼谷</span> · 东京 · 美国佐治亚 · 越南 · 印尼 · 沙特 · 俄罗斯
+        </p>
+        <div class="divider my-4"></div>
+        <p class="zh text-xs leading-relaxed" style="color:var(--dim)">2021 年集团产值约 5 亿元；2025.12 新设卡屋宠物用品公司，处于品类扩张期。</p>
+      </div>
+    </div>
+
+    <!-- channel status -->
+    <div class="glass p-6 md:p-9 mt-8 reveal" data-reveal>
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <div class="text-xs font-mono2 mb-2" style="color:var(--cyan)">CHANNEL AUDIT — THAILAND</div>
+          <h3 class="zh text-xl font-bold">泰国渠道布局盘点：7 条主干道，仅 2 条亮灯</h3>
+        </div>
+        <div class="flex items-center gap-5 text-xs font-mono2" style="color:var(--dim)">
+          <span class="flex items-center gap-2"><span class="status-dot on"></span>已布局</span>
+          <span class="flex items-center gap-2"><span class="status-dot off"></span>空白</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div class="rounded-xl p-4 border" style="border-color:rgba(8,217,214,.35);background:rgba(8,217,214,.06)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot on"></span><span class="text-xs font-mono2" style="color:var(--cyan)">SHOPEE TH</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">官方品牌店在营</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(8,217,214,.35);background:rgba(8,217,214,.06)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot on"></span><span class="text-xs font-mono2" style="color:var(--cyan)">LAZADA TH</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">官方店在营（2026.09 确认）</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.07)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot off"></span><span class="text-xs font-mono2" style="color:var(--pink)">TIKTOK SHOP</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">未检出泰国站店铺</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.07)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot off"></span><span class="text-xs font-mono2" style="color:var(--pink)">TIKTOK 账号</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">无泰国官方号</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.07)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot off"></span><span class="text-xs font-mono2" style="color:var(--pink)">INSTAGRAM</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">未检出官方账号</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.07)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot off"></span><span class="text-xs font-mono2" style="color:var(--pink)">FACEBOOK / LINE</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">未检出官方阵地</div>
+        </div>
+        <div class="rounded-xl p-4 border" style="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.07)">
+          <div class="flex items-center gap-2 mb-2"><span class="status-dot off"></span><span class="text-xs font-mono2" style="color:var(--pink)">YOUTUBE</span></div>
+          <div class="zh text-xs" style="color:var(--dim)">未检出官方频道</div>
+        </div>
+      </div>
+      <div class="mt-6 p-4 rounded-xl zh text-sm leading-relaxed"
+           style="background:rgba(249,200,14,.07);border:1px solid rgba(249,200,14,.3);color:var(--ink)">
+        <span style="color:var(--gold);font-weight:700">诊断结论：</span>
+        KAWU 当前是典型的"货架电商"打法——有店、有货、有本地团队，但<b>没有内容、没有达人、没有品牌资产沉淀</b>。
+        TikTok 上仅能在西语市场检索到零星 [Kawu] 商品，泰国内容场几乎为零。这意味着：一切从 0 开始，但也意味着——
+        <b style="color:var(--pink)">没有任何历史包袱，起号即冲刺。</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 02 MARKET -->
+<section id="market" class="relative z-10 px-6 md:px-16 py-24 md:py-32" style="background:linear-gradient(180deg,transparent,rgba(19,16,41,.55),transparent)">
+  <div class="max-w-6xl mx-auto">
+    <div class="kicker reveal" data-reveal>02 / MARKET PULSE</div>
+    <h2 class="sec-title text-3xl md:text-5xl mt-4 reveal" data-reveal>泰国大盘：<span style="color:var(--gold)">全球增速最快</span><br>的 TikTok 电商市场之一</h2>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+      <div class="glass p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--cyan)">1.07<span class="text-sm">万亿泰铢</span></div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">2025 泰国电商总盘子（约 330 亿美金，+17.6%）</div>
+      </div>
+      <div class="glass p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--pink)">217<span class="text-sm">%</span></div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">2025 Q1 泰国 TikTok Shop GMV 季度增速，全球单国双料冠军</div>
+      </div>
+      <div class="glass p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--gold)">51<span class="text-sm">%</span></div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">泰国消费者 TikTok Shop 使用率，已居第三大电商平台</div>
+      </div>
+      <div class="glass p-5 reveal" data-reveal>
+        <div class="num-hero text-2xl md:text-3xl" style="color:var(--violet)">73<span class="text-sm">%</span></div>
+        <div class="zh text-xs mt-2" style="color:var(--dim)">社交电商渗透率，"东南亚最大社交电商市场"</div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-6 mt-8">
+      <div class="glass p-6 md:p-8 lg:col-span-3 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-1" style="color:var(--cyan)">TIKTOK SHOP TH — TOP 10 CATEGORIES</div>
+        <h3 class="zh text-lg font-bold mb-1">品类大盘：美妆断层第一，<span style="color:var(--gold)">居家日用 / 家电走廊</span>是 KAWU 的位置</h3>
+        <p class="zh text-xs mb-4" style="color:var(--dim)">近一年泰国站 Top10 类目 GMV（亿美元）· 居家日用与家装建材合计贡献约 19 亿美金，厨房小家电正是内容电商的"展示型爆品"赛道</p>
+        <div id="chartCategory" class="chart-box"></div>
+      </div>
+      <div class="glass p-6 md:p-8 lg:col-span-2 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-1" style="color:var(--pink)">THAILAND E-COMMERCE GMV</div>
+        <h3 class="zh text-lg font-bold mb-1">整体电商规模：三年近乎翻倍</h3>
+        <p class="zh text-xs mb-4" style="color:var(--dim)">泰国电商 GMV（亿美金）· 2027E 预测 492.8 亿</p>
+        <div id="chartMarket" class="chart-box"></div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-8">
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="num-hero text-2xl" style="color:var(--cyan)">4600万</div>
+        <div class="zh text-sm mt-2 font-bold">TikTok 月活用户</div>
+        <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">仅次于 LINE（5400万）与 Facebook（5000万），是泰国第三大国民应用，79% 的成年人每月使用。</p>
+      </div>
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="num-hero text-2xl" style="color:var(--pink)">88%</div>
+        <div class="zh text-sm mt-2 font-bold">"看内容被种草后下单"</div>
+        <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">88% 的泰国消费者会因观看与产品相关的内容（不直接售卖）而做出购买决定——开箱、教程、测评皆催化剂。</p>
+      </div>
+      <div class="glass glass-hover p-6 reveal" data-reveal>
+        <div class="num-hero text-2xl" style="color:var(--gold)">10分钟 / 1亿泰铢</div>
+        <div class="zh text-sm mt-2 font-bold">直播爆发力样本</div>
+        <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">头部演员 Janey 一场 TikTok 直播 10 分钟吸引 110 万观众、成交 10 万+ 单——泰国直播带货的势能已被反复验证。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 03 CREATOR -->
+<section id="creator" class="relative z-10 px-6 md:px-16 py-24 md:py-32">
+  <div class="max-w-6xl mx-auto">
+    <div class="kicker reveal" data-reveal>03 / CREATOR ECONOMY</div>
+    <h2 class="sec-title text-3xl md:text-5xl mt-4 reveal" data-reveal>达人生态：<span style="color:var(--cyan)">小达人</span>，<br><span class="neon-text" style="color:var(--pink)">大转化</span></h2>
+    <p class="zh mt-6 max-w-3xl leading-relaxed reveal" data-reveal style="color:var(--dim)">
+      泰国 92% 的消费者依赖达人推荐做购买决策——东南亚最高（新加坡 76%）。
+      但转化效率与粉丝规模成反比：纳米/腰部达人以真实感和垂类匹配度碾压头部明星。
+      对 KAWU 这类"功能可视化"的厨房小家电，达人分销是最锋利的起量武器。
+    </p>
+
+    <div class="grid lg:grid-cols-5 gap-6 mt-12">
+      <div class="glass p-6 md:p-8 lg:col-span-3 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-1" style="color:var(--cyan)">ENGAGEMENT RATE BY CREATOR TIER</div>
+        <h3 class="zh text-lg font-bold mb-1">粉丝越少，互动越真</h3>
+        <p class="zh text-xs mb-4" style="color:var(--dim)">泰国市场各层级达人平均互动率（%）与单篇合作成本参考（美金）</p>
+        <div id="chartTier" class="chart-box"></div>
+      </div>
+      <div class="lg:col-span-2 flex flex-col gap-5">
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="num-hero text-2xl" style="color:var(--pink)">8.5% <span class="text-sm">vs</span> 1.9%</div>
+          <div class="zh text-sm mt-2 font-bold">纳米达人互动率是头部达人的 4.5 倍</div>
+          <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">5,000 粉的家居博主推荐一台煮蛋器，用户的感受是"朋友在分享"，而不是"广告在轰炸"。</p>
+        </div>
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="num-hero text-2xl" style="color:var(--gold)">$200–500 <span class="text-sm">/篇</span></div>
+          <div class="zh text-sm mt-2 font-bold">腰部达人成本，仅为头部 1/10</div>
+          <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">10 个腰部达人的矩阵打法，通常带来 5 倍互动率与 3 倍可追踪转化——这正是 MCN 的核心杠杆。</p>
+        </div>
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="num-hero text-2xl" style="color:var(--cyan)">20万+ / 300万</div>
+          <div class="zh text-sm mt-2 font-bold">泰国带货达人 / 平台累计商家</div>
+          <p class="zh text-xs mt-2 leading-relaxed" style="color:var(--dim)">达人供给充沛，垂类覆盖家居、美食、测评、生活方式——匹配厨房小家电的全部内容场景。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 04 RIVAL -->
+<section id="rival" class="relative z-10 px-6 md:px-16 py-24 md:py-32" style="background:linear-gradient(180deg,transparent,rgba(19,16,41,.55),transparent)">
+  <div class="max-w-6xl mx-auto">
+    <div class="kicker reveal" data-reveal>04 / COMPETITIVE TEARDOWN</div>
+    <h2 class="sec-title text-3xl md:text-5xl mt-4 reveal" data-reveal>竞品拆解：同品类品牌<br>已经在泰国<span class="neon-text" style="color:var(--pink)">跑通了模型</span></h2>
+    <p class="zh mt-6 max-w-3xl leading-relaxed reveal" data-reveal style="color:var(--dim)">
+      YOTEX、Simplus、Redchef——三个与 KAWU 供应链画像高度相似的中国小家电/厨具品牌，用 2-4 年时间在泰国 TikTok Shop 完成了从 0 到数千万美金的积累。
+      它们验证的不是运气，而是一条可复制的路径：<b style="color:var(--ink)">本地发货 + 达人分销 + 场景化内容 + 高频自播</b>。
+    </p>
+
+    <div class="grid lg:grid-cols-5 gap-6 mt-12">
+      <div class="glass p-6 md:p-8 lg:col-span-3 reveal" data-reveal>
+        <div class="text-xs font-mono2 mb-1" style="color:var(--pink)">MONTHLY GMV — TIKTOK SHOP TH</div>
+        <h3 class="zh text-lg font-bold mb-1">单月 GMV 对标（2026 年数据）</h3>
+        <p class="zh text-xs mb-4" style="color:var(--dim)">YOTEX 132 万美金（8月）· Simplus 88.8 万美金（7月）· 几素 33 万美金量级（4月，约合人民币 235 万）</p>
+        <div id="chartRival" class="chart-box"></div>
+      </div>
+      <div class="lg:col-span-2 flex flex-col gap-5">
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="flex items-baseline justify-between">
+            <div class="zh font-bold" style="color:var(--cyan)">YOTEX · 小家电矩阵</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">累计 $2,565万</div>
+          </div>
+          <div class="divider my-3"></div>
+          <ul class="zh text-xs leading-relaxed space-y-1.5" style="color:var(--dim)">
+            <li>· <b style="color:var(--ink)">6,991 名达人</b>参与分销，30 天产出 1.59 万条视频/直播</li>
+            <li>· 单条搅拌机场景视频 <b style="color:var(--ink)">1,330 万播放</b>、$8.4 万成交</li>
+            <li>· 泰语详情页 + 本地仓 2-3 天达 + 24h 发货</li>
+          </ul>
+        </div>
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="flex items-baseline justify-between">
+            <div class="zh font-bold" style="color:var(--gold)">Simplus · 家电直播一哥</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">2021 创立于泰国</div>
+          </div>
+          <div class="divider my-3"></div>
+          <ul class="zh text-xs leading-relaxed space-y-1.5" style="color:var(--dim)">
+            <li>· 2022.11 起霸榜 TikTok 家电直播类目至今</li>
+            <li>· GMV 结构：<b style="color:var(--ink)">直播 52% + 短视频 42%</b></li>
+            <li>· 日均自播 16-17 小时，单场 1.5-3 万观看</li>
+            <li>· Shopee 小家电仅次于飞利浦，2023 双11 单日破 $100 万</li>
+          </ul>
+        </div>
+        <div class="glass glass-hover p-6 reveal" data-reveal>
+          <div class="flex items-baseline justify-between">
+            <div class="zh font-bold" style="color:var(--violet)">Redchef · 锅具黑马</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">东南亚 200 万口</div>
+          </div>
+          <div class="divider my-3"></div>
+          <ul class="zh text-xs leading-relaxed space-y-1.5" style="color:var(--dim)">
+            <li>· 双 11 单日 $11 万，闯入东南亚跨境全行业 Top 9</li>
+            <li>· 跳过头部顶流，专搭<b style="color:var(--ink)">中腰部达人网络</b></li>
+            <li>· 四国本地直播间：本地食材 + 本地语言做菜</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-6 md:p-8 mt-8 reveal" data-reveal>
+      <h3 class="zh text-lg font-bold mb-4" style="color:var(--ink)">同赛道起量公式（已被三个品牌交叉验证）</h3>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-4 rounded-xl" style="background:rgba(8,217,214,.06);border:1px solid rgba(8,217,214,.25)">
+          <div class="font-mono2 text-xs mb-2" style="color:var(--cyan)">STEP 1</div>
+          <div class="zh text-sm font-bold">功能即内容</div>
+          <p class="zh text-xs mt-1" style="color:var(--dim)">食材进锅→成品出锅，视觉变化自带爽感，天然适配短视频</p>
+        </div>
+        <div class="p-4 rounded-xl" style="background:rgba(255,46,99,.06);border:1px solid rgba(255,46,99,.25)">
+          <div class="font-mono2 text-xs mb-2" style="color:var(--pink)">STEP 2</div>
+          <div class="zh text-sm font-bold">达人铺量分销</div>
+          <p class="zh text-xs mt-1" style="color:var(--dim)">数千名中腰部达人形成"内容蜂群"，覆盖烹饪/家居/测评场景</p>
+        </div>
+        <div class="p-4 rounded-xl" style="background:rgba(249,200,14,.06);border:1px solid rgba(249,200,14,.25)">
+          <div class="font-mono2 text-xs mb-2" style="color:var(--gold)">STEP 3</div>
+          <div class="zh text-sm font-bold">品牌高频自播</div>
+          <p class="zh text-xs mt-1" style="color:var(--dim)">长时直播承接流量，Simplus 模式验证直播可贡献过半 GMV</p>
+        </div>
+        <div class="p-4 rounded-xl" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3)">
+          <div class="font-mono2 text-xs mb-2" style="color:var(--violet)">STEP 4</div>
+          <div class="zh text-sm font-bold">本地化履约</div>
+          <p class="zh text-xs mt-1" style="color:var(--dim)">泰语 listing + 本地仓 2-3 天达 + 本地售后，消除下单阻力</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 05 PLAN -->
+<section id="plan" class="relative z-10 px-6 md:px-16 py-24 md:py-32">
+  <div class="max-w-6xl mx-auto">
+    <div class="kicker reveal" data-reveal>05 / PARTNERSHIP BLUEPRINT</div>
+    <h2 class="sec-title text-3xl md:text-5xl mt-4 reveal" data-reveal>合作方案：<span class="cyan-text" style="color:var(--cyan)">90 天</span><br>把 KAWU 推进泰国内容场</h2>
+    <p class="zh mt-6 max-w-3xl leading-relaxed reveal" data-reveal style="color:var(--dim)">
+      以 MCN 达人网络 + 内容工业化 + 自播代运营三件套，复刻 YOTEX / Simplus 已验证的路径，
+      并叠加 KAWU 的独家优势：工厂直供货盘、400+ SKU 品类纵深、曼谷本地团队协同。
+    </p>
+
+    <div class="grid lg:grid-cols-3 gap-5 mt-12">
+      <!-- phase cards -->
+      <div class="glass glass-hover p-7 reveal" data-reveal>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center font-display font-extrabold"
+               style="background:rgba(8,217,214,.15);color:var(--cyan);border:1px solid rgba(8,217,214,.4)">P1</div>
+          <div>
+            <div class="zh font-bold">基建期</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">DAY 1 – 30</div>
+          </div>
+        </div>
+        <ul class="zh text-sm leading-relaxed space-y-2.5" style="color:var(--dim)">
+          <li><b style="color:var(--ink)">开店：</b>TikTok Shop 泰国本土店入驻（借力曼谷分公司主体），完成 TISI 认证核查</li>
+          <li><b style="color:var(--ink)">起号：</b>TikTok 泰国官方账号 + 独立站外引流位，统一视觉锤</li>
+          <li><b style="color:var(--ink)">内容：</b>首批 60 条短视频——本地食材泰餐场景 × 王牌多功能料理锅 / 空气炸锅</li>
+          <li><b style="color:var(--ink)">达人：</b>签约 100 名纳米/腰部达人（美食·家居·测评垂类）冷启动铺量</li>
+        </ul>
+        <div class="divider my-4"></div>
+        <div class="font-mono2 text-xs" style="color:var(--cyan)">KPI：账号 0→1 万粉 · 首批内容 50 万播放 · 跑通首单</div>
+      </div>
+
+      <div class="glass glass-hover p-7 reveal" data-reveal>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center font-display font-extrabold"
+               style="background:rgba(255,46,99,.15);color:var(--pink);border:1px solid rgba(255,46,99,.4)">P2</div>
+          <div>
+            <div class="zh font-bold">引爆期</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">DAY 31 – 60</div>
+          </div>
+        </div>
+        <ul class="zh text-sm leading-relaxed space-y-2.5" style="color:var(--dim)">
+          <li><b style="color:var(--ink)">蜂群：</b>达人网络扩至 500+，月产 1,500 条带货内容（对标 YOTEX 密度）</li>
+          <li><b style="color:var(--ink)">自播：</b>品牌直播间上线，日均 8 小时泰语直播，主推 3-5 个引流款</li>
+          <li><b style="color:var(--ink)">爆款：</b>数据回流筛选 Top 内容，加投放大，打造单品爆款链接</li>
+          <li><b style="color:var(--ink)">矩阵：</b>IG / Facebook 同步分发种草素材，沉淀品牌搜索资产</li>
+        </ul>
+        <div class="divider my-4"></div>
+        <div class="font-mono2 text-xs" style="color:var(--pink)">KPI：单月 GMV $5–10 万 · 达人分销占比 >60%</div>
+      </div>
+
+      <div class="glass glass-hover p-7 reveal" data-reveal>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center font-display font-extrabold"
+               style="background:rgba(249,200,14,.15);color:var(--gold);border:1px solid rgba(249,200,14,.4)">P3</div>
+          <div>
+            <div class="zh font-bold">大促冲刺期</div>
+            <div class="font-mono2 text-xs" style="color:var(--dim)">DAY 61 – 90</div>
+          </div>
+        </div>
+        <ul class="zh text-sm leading-relaxed space-y-2.5" style="color:var(--dim)">
+          <li><b style="color:var(--ink)">节点：</b>卡位 11.11 / 12.12 双大促，提前 4 周蓄水（达人内容 + 直播预约）</li>
+          <li><b style="color:var(--ink)">头部：</b>引入 3-5 名泰国头部家电/生活方式达人做信任背书</li>
+          <li><b style="color:var(--ink)">直播：</b>大促期间 16 小时轮播制（Simplus 模式），GMV Max 投放解锁佣金减免</li>
+          <li><b style="color:var(--ink)">复购：</b>LINE OA 私域沉淀，优惠券 + 会员体系承接复购</li>
+        </ul>
+        <div class="divider my-4"></div>
+        <div class="font-mono2 text-xs" style="color:var(--gold)">KPI：大促单日 GMV $2 万+ · 累计 GMV $20 万+</div>
+      </div>
+    </div>
+
+    <!-- why us -->
+    <div class="glass p-6 md:p-9 mt-8 reveal" data-reveal>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <div class="kicker mb-4">WHY THIS MCN</div>
+          <h3 class="zh text-xl font-bold mb-4">为什么是我们</h3>
+          <ul class="zh text-sm leading-relaxed space-y-3" style="color:var(--dim)">
+            <li><b style="color:var(--cyan)">本土达人池：</b>深耕泰国美食 / 家居 / 测评垂类，可快速调集 500+ 认证达人</li>
+            <li><b style="color:var(--pink)">内容工业化：</b>单品脚本库 × 场景模板库，周产能 300+ 条素材</li>
+            <li><b style="color:var(--gold)">直播操盘：</b>泰语主播 + 中控 + 投流三位一体，复制 Simplus 长时直播模型</li>
+            <li><b style="color:var(--violet)">数据驱动：</b>FastoMoss / Kalodata 级监测，周报颗粒度到单品链接</li>
+          </ul>
+        </div>
+        <div>
+          <div class="kicker mb-4" style="color:var(--gold)">RISK CONTROL</div>
+          <h3 class="zh text-xl font-bold mb-4">风险前置管理</h3>
+          <ul class="zh text-sm leading-relaxed space-y-3" style="color:var(--dim)">
+            <li><b style="color:var(--ink)">TISI 合规：</b>2026.6.30 起家电类强制认证核查，无证即下架——入驻前完成认证核查与泰文标签（含二维码）整改</li>
+            <li><b style="color:var(--ink)">商标确权：</b>泰国未加入马德里体系，需单一国注册，防抢注（前车之鉴：几素在泰被盗版 200 万台）</li>
+            <li><b style="color:var(--ink)">税费新政：</b>2026.1.1 起取消 1500 泰铢以下免税，直邮红利收缩——本地仓备货为核心解法</li>
+            <li><b style="color:var(--ink)">平台费率：</b>非 Mall 佣金已升至约 8%（含税），定价模型需预留佣金 + 增长服务费空间</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- closing -->
+    <div class="mt-14 text-center reveal" data-reveal>
+      <div class="font-display text-2xl md:text-4xl font-extrabold leading-snug">
+        货盘你们已经有，<span class="neon-text" style="color:var(--pink)">内容阵地交给我们。</span>
+      </div>
+      <p class="zh text-sm mt-4" style="color:var(--dim)">90 天，给 KAWU 一个能自我造血的泰国内容电商增长飞轮。</p>
+      <a href="#client" class="inline-block zh mt-8 px-9 py-4 rounded-full text-sm font-medium"
+         style="background:linear-gradient(90deg,var(--pink),#ff5c86);box-shadow:0 12px 36px -8px rgba(255,46,99,.6)">回到开头，再看一遍机会</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="relative z-10 px-6 md:px-16 py-16 border-t" style="border-color:rgba(255,255,255,.07)">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-8">
+    <div>
+      <div class="font-display font-extrabold text-lg">KAWU × THAILAND</div>
+      <p class="zh text-sm mt-3 max-w-md" style="color:var(--dim)">
+        本提案数据来源：TikTok Shop 官方规则公告、Kalodata / FastMoss 公开数据、THECA 泰国电商协会、
+        Priceza 2025 消费者报告、Kommune Agency 泰国达人营销报告及公开媒体报道。数据截至 2026 年 9 月，仅供提案讨论使用。
+      </p>
+    </div>
+    <div class="text-right">
+      <div class="kicker mb-2">NEXT STEP</div>
+      <p class="zh text-sm" style="color:var(--dim)">确认方案方向 → 双方对齐货盘与预算 → 30 天冷启动排期</p>
+      <div class="tag mt-4" style="border-color:rgba(8,217,214,.4);color:var(--cyan)">PROPOSAL V1.0 · 2026.09</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============ GSAP base ============ */
+gsap.registerPlugin(ScrollTrigger);
+
+/* progress bar */
+gsap.to("#progress",{width:"100%",ease:"none",
+  scrollTrigger:{trigger:document.body,start:"top top",end:"bottom bottom",scrub:.3}});
+
+/* reveal animations */
+document.querySelectorAll("[data-reveal]").forEach(el=>{
+  gsap.to(el,{opacity:1,y:0,duration:.9,ease:"power3.out",
+    scrollTrigger:{trigger:el,start:"top 88%"}});
+});
+
+/* ============ ECharts helpers ============ */
+const FONT="'Noto Sans SC','Space Grotesk',sans-serif";
+const MONO="'JetBrains Mono',monospace";
+const C={pink:'#FF2E63',cyan:'#08D9D6',gold:'#F9C80E',violet:'#8B5CF6',dim:'#9C96B8',ink:'#EDEBF6'};
+const charts=[];
+function make(id,opt){
+  const el=document.getElementById(id); if(!el) return;
+  const ch=echarts.init(el,null,{renderer:'svg'});
+  opt.textStyle={fontFamily:FONT,color:C.dim};
+  ch.setOption(opt); charts.push(ch);
+  // animate in
+  ScrollTrigger.create({trigger:el,start:"top 85%",once:true,onEnter:()=>ch.dispatchAction({type:'highlight'})});
+  return ch;
+}
+window.addEventListener('resize',()=>charts.forEach(c=>c.resize()));
+
+/* tooltip style */
+const TT={
+  backgroundColor:'rgba(19,16,41,.95)',borderColor:'rgba(255,255,255,.14)',
+  borderWidth:1,padding:[10,14],textStyle:{color:C.ink,fontFamily:FONT,fontSize:12},
+  extraCssText:'border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 12px 32px rgba(0,0,0,.45);'
+};
+
+/* ============ CHART 1: category bars ============ */
+make('chartCategory',{
+  grid:{left:8,right:40,top:10,bottom:8,containLabel:true},
+  tooltip:{...TT,formatter:p=>`<b>${p.name}</b><br/>GMV：${p.value} 亿美元 · 占比 ${p.data.pct}%`},
+  xAxis:{type:'value',splitLine:{lineStyle:{color:'rgba(255,255,255,.05)'}},axisLabel:{fontFamily:MONO,fontSize:10}},
+  yAxis:{type:'category',
+    data:['运动户外','汽车摩托','男装','家装建材','手机数码','居家日用','女装','食品饮料','保健','美妆个护'],
+    axisLine:{show:false},axisTick:{show:false},axisLabel:{fontSize:12}},
+  series:[{
+    type:'bar',barWidth:16,
+    data:[
+      {value:6.0,pct:'4%',itemStyle:{color:'#3d3757'}},
+      {value:6.0,pct:'4%',itemStyle:{color:'#3d3757'}},
+      {value:6.1,pct:'4%',itemStyle:{color:'#3d3757'}},
+      {value:6.5,pct:'4%',itemStyle:{color:'rgba(139,92,246,.75)'}},
+      {value:10.7,pct:'7%',itemStyle:{color:'#3d3757'}},
+      {value:12.6,pct:'9%',itemStyle:{color:'#F9C80E'}},
+      {value:17.5,pct:'12%',itemStyle:{color:'#3d3757'}},
+      {value:18.5,pct:'12%',itemStyle:{color:'#3d3757'}},
+      {value:19.6,pct:'13%',itemStyle:{color:'#08D9D6'}},
+      {value:43.2,pct:'29%',itemStyle:{color:'#FF2E63'}}
+    ],
+    itemStyle:{borderRadius:[0,8,8,0]},
+    label:{show:true,position:'right',fontFamily:MONO,fontSize:11,color:'#9C96B8',
+      formatter:'{c}'},
+    animationDuration:1400,animationEasing:'elasticOut'
+  }]
+});
+
+/* ============ CHART 2: market growth ============ */
+make('chartMarket',{
+  grid:{left:8,right:14,top:30,bottom:8,containLabel:true},
+  tooltip:{...TT,formatter:p=>`<b>${p.name}</b><br/>电商 GMV：${p.value} 亿美金`},
+  xAxis:{type:'category',data:['2024','2025','2027E'],
+    axisLine:{lineStyle:{color:'rgba(255,255,255,.15)'}},axisTick:{show:false},axisLabel:{fontFamily:MONO}},
+  yAxis:{type:'value',splitLine:{lineStyle:{color:'rgba(255,255,255,.05)'}},axisLabel:{fontFamily:MONO,fontSize:10}},
+  series:[{
+    type:'bar',barWidth:44,
+    data:[
+      {value:280,itemStyle:{color:'#3d3757'}},
+      {value:330,itemStyle:{color:'#8B5CF6'}},
+      {value:493,itemStyle:{color:'#08D9D6',
+        opacity:.9}}
+    ],
+    itemStyle:{borderRadius:[10,10,0,0]},
+    label:{show:true,position:'top',fontFamily:MONO,fontSize:12,color:'#EDEBF6',formatter:'{c}'},
+    markLine:{symbol:'none',silent:true,
+      lineStyle:{color:'rgba(249,200,14,.6)',type:'dashed'},
+      label:{show:true,formatter:'CAGR ≈ +21%',color:'#F9C80E',fontFamily:MONO,fontSize:10,position:'insideEndTop'},
+      data:[{yAxis:330}]},
+    animationDuration:1400
+  }]
+});
+
+/* ============ CHART 3: creator tiers ============ */
+make('chartTier',{
+  grid:{left:8,right:8,top:44,bottom:8,containLabel:true},
+  legend:{data:['平均互动率 %','单篇成本 $'],top:0,textStyle:{color:'#9C96B8',fontSize:11},itemWidth:14,itemHeight:8},
+  tooltip:{...TT,formatter:ps=>{
+    let h=`<b>${ps[0].name}</b>`;
+    ps.forEach(p=>h+=`<br/>${p.marker}${p.seriesName}：${p.value}${p.seriesName.includes('互动')?'%':' 美金'}`);
+    return h;}},
+  xAxis:{type:'category',data:['纳米 1K-1万','腰部 1万-10万','头部 10万-100万','明星 100万+'],
+    axisLine:{lineStyle:{color:'rgba(255,255,255,.15)'}},axisTick:{show:false},axisLabel:{fontSize:11}},
+  yAxis:[
+    {type:'value',max:10,splitLine:{lineStyle:{color:'rgba(255,255,255,.05)'}},axisLabel:{fontFamily:MONO,fontSize:10,formatter:'{value}%'}},
+    {type:'value',max:2500,splitLine:{show:false},axisLabel:{fontFamily:MONO,fontSize:10,formatter:'${value}'}}
+  ],
+  series:[
+    {name:'平均互动率 %',type:'bar',barWidth:30,
+     data:[8.5,6.2,3.8,1.9],
+     itemStyle:{borderRadius:[8,8,0,0],
+       color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF2E63'},{offset:1,color:'rgba(255,46,99,.25)'}])},
+     label:{show:true,position:'top',fontFamily:MONO,fontSize:11,color:'#FF2E63',formatter:'{c}%'},
+     animationDelay:i=>i*150},
+    {name:'单篇成本 $',type:'line',yAxisIndex:1,
+     data:[80,350,1200,2200],
+     lineStyle:{color:'#F9C80E',width:2.5},
+     itemStyle:{color:'#F9C80E',borderColor:'#0B0A1A',borderWidth:2},
+     symbol:'circle',symbolSize:9,
+     label:{show:true,position:'top',fontFamily:MONO,fontSize:10,color:'#F9C80E',formatter:'${c}'},
+     smooth:true,animationDelay:i=>300+i*150}
+  ]
+});
+
+/* ============ CHART 4: rivals ============ */
+make('chartRival',{
+  grid:{left:8,right:20,top:34,bottom:8,containLabel:true},
+  tooltip:{...TT,formatter:p=>`<b>${p.name}</b><br/>单月 GMV：${p.value} 万美金<br/><span style="color:#9C96B8">${p.data.note}</span>`},
+  xAxis:{type:'category',data:['几素 JisuLife\n(4月)','Simplus\n(7月)','YOTEX\n(8月)'],
+    axisLine:{lineStyle:{color:'rgba(255,255,255,.15)'}},axisTick:{show:false},axisLabel:{fontSize:11,lineHeight:16}},
+  yAxis:{type:'value',splitLine:{lineStyle:{color:'rgba(255,255,255,.05)'}},
+    axisLabel:{fontFamily:MONO,fontSize:10,formatter:'{value}万$'}},
+  series:[{
+    type:'bar',barWidth:52,
+    data:[
+      {value:33,note:'风扇单品类 · 泰国站官方店',itemStyle:{color:'#3d3757'}},
+      {value:88.8,note:'全品类小家电 · 直播占52%',itemStyle:{color:'#08D9D6'}},
+      {value:132,note:'全品类小家电 · 6991达人分销',itemStyle:{color:'#FF2E63'}}
+    ],
+    itemStyle:{borderRadius:[10,10,0,0]},
+    label:{show:true,position:'top',fontFamily:MONO,fontSize:13,color:'#EDEBF6',
+      formatter:p=>p.value+'万$'},
+    animationDuration:1500,animationEasing:'elasticOut'
+  }],
+  graphic:[{
+    type:'text',right:14,bottom:6,
+    style:{text:'KAWU 目标：90 天进入此坐标系',fill:'#F9C80E',fontSize:11,fontFamily:'Noto Sans SC',fontWeight:'bold'}
+  }]
+});
+
+/* ============ chart animate on scroll ============ */
+charts.forEach(ch=>{
+  const el=ch.getDom();
+  ScrollTrigger.create({trigger:el,start:'top 85%',once:true,onEnter:()=>{
+    const opt=ch.getOption();
+    ch.clear();
+    ch.setOption(opt);
+  }});
+});
+</script>
+</body>
+</html>
